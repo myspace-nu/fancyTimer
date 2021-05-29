@@ -1,7 +1,6 @@
 var fancytimer = function(options) {
 	var thisTimer = this;
-	var isObject=function(r){return r&&"object"==typeof r&&!Array.isArray(r)};
-	var mergeDeep=function(e,...t){if(!t.length)return e;const i=t.shift();if(isObject(e)&&isObject(i))for(const t in i)isObject(i[t])?(e[t]||Object.assign(e,{[t]:{}}),mergeDeep(e[t],i[t])):Object.assign(e,{[t]:i[t]});return mergeDeep(e,...t)};
+	var mergeDeep=function r(...e){const c=r=>r&&"object"==typeof r;return e.reduce((e,t)=>(Object.keys(t).forEach(a=>{const o=e[a],n=t[a];Array.isArray(o)&&Array.isArray(n)?e[a]=o.concat(...n):c(o)&&c(n)?e[a]=r(o,n):e[a]=n}),e),{})};
 	var settings = mergeDeep({
 		hours:0, minutes: 0, seconds: 0,
 		loop: false,
@@ -10,12 +9,15 @@ var fancytimer = function(options) {
 			'font-style': "Arial",
 			'line-width': 8
 		},
-		onElapsed: function() {}
+		onElapsed: function(){}
 	},options);
 	settings.seconds = settings.hours*3600 + settings.minutes*60 + settings.seconds;
 
 	this.startTime = settings.startTime ?? null;
 	this.endTime = settings.endTime ?? null;
+	if(this.endTime && settings.seconds)
+		this.startTime = new Date(this.endTime.getTime()-settings.seconds*1000);
+
 	this.elapsedms = 0;
 	this.remainingms = settings.seconds * 1000;
 
@@ -26,7 +28,7 @@ var fancytimer = function(options) {
 		thisTimer.timer = window.setInterval(function() {
 			updateTimer();
 		}, 100);
-	}
+	};
 	var formatTime = function(seconds) {
 		seconds = Math.round(seconds);
 		var h = Math.floor(seconds / 3600);
@@ -50,8 +52,13 @@ var fancytimer = function(options) {
 		}
 	}
 	var updateTimer = function() {
-		thisTimer.elapsedms = (thisTimer.startTime) ? new Date().getTime() - thisTimer.startTime.getTime() : 0;
-		thisTimer.remainingms = settings.seconds * 1000 - thisTimer.elapsedms;
+		if(!thisTimer.startTime){
+
+		} else if(new Date().getTime() > thisTimer.startTime.getTime()){
+			thisTimer.elapsedms = new Date().getTime() - thisTimer.startTime.getTime();
+			thisTimer.remainingms = settings.seconds * 1000 - thisTimer.elapsedms;
+		}
+		
 		if (thisTimer.remainingms <= 0) {
 			stopTimer();
 			thisTimer.elapsedms = settings.seconds * 1000;
