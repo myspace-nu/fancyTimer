@@ -12,25 +12,18 @@ var fancytimer = function(options) {
 		formatter:function(timer){
 			return { text: formatTime(Math.ceil(timer.remainingms / 1000)), percentDone: timer.remainingms / (settings.seconds * 1000) }
 		},
-		onElapsed: function(){}
+		onElapsed: function(){},
+		onPause: function(){},
+		onResume: function(){},
+		onStop: function(){},
+		onStart: function(){},
+		onReset: function(){},
 	},options);
 	settings.seconds = settings.hours*3600 + settings.minutes*60 + settings.seconds;
 
-	this.startTime = settings.startTime ?? null;
-	this.endTime = settings.endTime ?? null;
-	if(this.endTime && settings.seconds)
-		this.startTime = new Date(this.endTime.getTime()-settings.seconds*1000);
-
-	this.elapsedms = 0;
-	this.remainingms = settings.seconds * 1000;
-
-	var c = document.getElementById(settings.canvas);
-	var ctx = c.getContext("2d");
-	this.start = function() {
-		thisTimer.startTime = thisTimer.startTime ?? new Date();
-		thisTimer.timer = window.setInterval(function() {
-			updateTimer();
-		}, 100);
+	// Private functions
+	var stopTimer = function() {
+		window.clearInterval(thisTimer.timer);
 	};
 	var formatTime = function(seconds) {
 		seconds = Math.round(seconds);
@@ -55,11 +48,13 @@ var fancytimer = function(options) {
 		}
 	}
 	var updateTimer = function() {
+		if(thisTimer.paused)
+			return;
 		if(!thisTimer.startTime){
 
 		} else if(new Date().getTime() > thisTimer.startTime.getTime()){
 			thisTimer.elapsedms = new Date().getTime() - thisTimer.startTime.getTime();
-			thisTimer.remainingms = settings.seconds * 1000 - thisTimer.elapsedms;
+			thisTimer.remainingms = thisTimer.endTime.getTime() - new Date().getTime(); //   settings.seconds * 1000 - thisTimer.elapsedms;
 		}
 		
 		if (thisTimer.remainingms <= 0) {
@@ -103,9 +98,56 @@ var fancytimer = function(options) {
 		ctx.fillText(timerText, c.width / 2, (c.height/2)+(textSize*0.75)/2 );
 
 	};
-	var stopTimer = function() {
-		window.clearInterval(thisTimer.timer);
+	// Private variables
+	var pauseTime = null;
+	var c = document.getElementById(settings.canvas);
+	var ctx = c.getContext("2d");
+	// Public functions
+	this.start = function() {
+		thisTimer.reset();
+		// if(thisTimer.started) return;
+		thisTimer.started = true;
+		thisTimer.startTime = thisTimer.startTime ?? new Date();
+		thisTimer.endTime = new Date(thisTimer.startTime.getTime() + settings.seconds*1000);
+		thisTimer.timer = window.setInterval(function() {
+			updateTimer();
+		}, 100);
+		settings.onStart.call(this, thisTimer);
+	};
+	this.pause = function(){
+		if(!thisTimer.started || thisTimer.paused)
+			return;
+		pauseTime = new Date();
+		thisTimer.paused = true;
+		settings.onPause.call(this, thisTimer);
+	};
+	this.resume = function(){
+		if(!thisTimer.started || !thisTimer.paused)
+			return;
+		var ms = new Date().getTime() - pauseTime.getTime();
+		thisTimer.endTime = new Date(thisTimer.endTime.getTime()+ms);
+		thisTimer.paused = false;
+		settings.onResume.call(this, thisTimer);
+	};
+	this.stop = function(){
+		thisTimer.reset();
+		updateTimer();
+		settings.onStop.call(this, thisTimer);
 	}
+	this.reset = function(){
+		stopTimer();
+		thisTimer.paused = false;
+		thisTimer.started = false;
+		thisTimer.startTime = settings.startTime ?? null;
+		thisTimer.endTime = settings.endTime ?? null;
+		if(thisTimer.endTime && settings.seconds)
+		thisTimer.startTime = new Date(thisTimer.endTime.getTime()-settings.seconds*1000);
+		thisTimer.elapsedms = 0;
+		thisTimer.remainingms = settings.seconds * 1000;
+		settings.onReset.call(this, thisTimer);
+	}
+	this.reset();
+
 	updateTimer();
 	return thisTimer;
 };
