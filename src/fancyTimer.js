@@ -9,6 +9,9 @@ var fancytimer = function(options) {
 			'font-style': "Arial",
 			'line-width': 8
 		},
+		formatter:function(timer){
+			return { text: formatTime(Math.ceil(timer.remainingms / 1000)), percentDone: timer.remainingms / (settings.seconds * 1000) }
+		},
 		onElapsed: function(){}
 	},options);
 	settings.seconds = settings.hours*3600 + settings.minutes*60 + settings.seconds;
@@ -65,7 +68,10 @@ var fancytimer = function(options) {
 			thisTimer.remainingms = 0;
 			settings.onElapsed.call(this, thisTimer);
 		}
-		var percent = thisTimer.remainingms / (settings.seconds * 1000);
+		var state = settings.formatter(thisTimer);
+		var percent = (typeof state === 'object' && 'percentDone' in state) ? state.percentDone : thisTimer.remainingms / (settings.seconds * 1000);
+		var timerText = (typeof state === 'object' && 'text' in state) ? state.text : state;
+
 		ctx.clearRect(0, 0, c.width, c.height);
 		ctx.beginPath();
 		ctx.strokeStyle = settings.style.color;
@@ -88,8 +94,7 @@ var fancytimer = function(options) {
 			var p = displace(c.width/2, c.height/2, 360*iperc, (Math.min(c.width, c.height)/2)-(ctx.lineWidth/2));
 			circle(ctx, p.x, p.y, (ctx.lineWidth/4), settings.style.color);
 		}
-
-		var timerText = formatTime(Math.ceil(thisTimer.remainingms / 1000));
+		
 		var textScale = (1/((""+timerText).length/6))*0.4; textScale=Math.min(textScale,1);
 		var textSize = ((Math.min(c.width, c.height) * 0.5) * textScale);
 		ctx.font = textSize + "px " + settings.style['font-style'];
