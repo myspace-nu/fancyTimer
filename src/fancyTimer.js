@@ -7,7 +7,7 @@ var fancytimer = function(options) {
 		loop: false,
 		style:{
 			'color': "#aaa",
-			'font-style': "Arial",
+			'font': "Arial",
 			'line-width': 8
 		},
 		formatter:function(timer){
@@ -119,7 +119,7 @@ var fancytimer = function(options) {
 		
 		var textScale = (1/((""+timerText).length/6))*0.4; textScale=Math.min(textScale,1);
 		var textSize = ((Math.min(c.width, c.height) * 0.5) * textScale);
-		ctx.font = textSize + "px " + settings.style['font-style'];
+		ctx.font = textSize + "px " + settings.style['font'];
 		ctx.fillStyle = settings.style.color;
 		ctx.textAlign = "center";
 		ctx.fillText(timerText, c.width / 2, (c.height/2)+(textSize*0.75)/2 );
