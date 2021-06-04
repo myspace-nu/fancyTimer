@@ -5,7 +5,7 @@
 
 ## Live demo
 
-See a live demo on [CodePen](https://codepen.io/myspace-nu/full/ZVEKyR)
+See a live demo on [CodePen](https://codepen.io/myspace-nu/pen/eYvMjQQ)
 
 ## Installation
 
