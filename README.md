@@ -3,6 +3,24 @@
 [![Build Status](https://travis-ci.com/myspace-nu/fancyTimer.svg?branch=main)](https://travis-ci.com/myspace-nu/fancyTimer)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/myspace-nu/fancyTimer/blob/master/LICENSE)
 
+## Live demo
+
+See a live demo on [CodePen](https://codepen.io/myspace-nu/full/ZVEKyR)
+
+## Installation
+
+Using npm
+
+	npm i @myspace-nu/fancytimer --save
+
+Using CDN
+
+	<script src="https://cdn.jsdelivr.net/npm/@myspace-nu/fancytimer/dist/fancyTimer.min.js"></script>
+
+Or manually by including the script
+
+	<script src="/path/to/fancyTimer.min.js"></script>
+
 ## Usage
 
 	<canvas id="myCanvas" width="100" height="100">
