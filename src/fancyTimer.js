@@ -6,12 +6,12 @@ var fancytimer = function(options) {
 		showGrains: true,
 		loop: false,
 		style:{
-			'color': "rgba(0,0,0,0.5)",
+			'color': "#aaa",
 			'font-style': "Arial",
 			'line-width': 8
 		},
 		formatter:function(timer){
-			return { text: formatTime(Math.ceil(timer.remainingms / 1000)), percentDone: timer.remainingms / (timer.endTime.getTime()-timer.startTime.getTime()) }
+			return { text: formatTime(Math.ceil(timer.remainingms / 1000)), percentDone: (timer.remainingms/(timer.endTime.getTime()-timer.startTime.getTime()))*100 }
 		},
 		onElapsed: function(){},
 		onPause: function(){},
@@ -88,7 +88,7 @@ var fancytimer = function(options) {
 			settings.onElapsed.call(this, thisTimer);
 		}
 		var state = settings.formatter(thisTimer);
-		var percent = (typeof state === 'object' && 'percentDone' in state) ? state.percentDone : thisTimer.remainingms / (thisTimer.endTime.getTime()-thisTimer.startTime.getTime());
+		var percent = (typeof state === 'object' && 'percentDone' in state) ? state.percentDone/100 : thisTimer.remainingms / (thisTimer.endTime.getTime()-thisTimer.startTime.getTime());
 		var timerText = (typeof state === 'object' && 'text' in state) ? state.text : state;
 
 		ctx.clearRect(0, 0, c.width, c.height);
