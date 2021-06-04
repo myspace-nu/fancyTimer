@@ -1,5 +1,5 @@
 {
-  "name": "myspace-nu/fancyTimer",
+  "name": "@myspace-nu/fancyTimer",
   "version": "1.0.0",
   "description": "A simple JavaSript timer",
   "main": "dist/jquery.fancyTimer.min.js",
