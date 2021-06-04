@@ -14,6 +14,7 @@
 			<h1>FancyTimer</h1>
 			<script src="../src/fancyTimer.js"></script>
 			<style type="text/css">
+				@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
 				.flexbox { display:flex; }
 				.flexbox>* { margin: 1em; }
 				.flexbox .form-control { display: inline-block !important; width: auto !important; }
@@ -32,15 +33,15 @@
 			<script type="text/javascript">
 				var myTimer;
 				window.addEventListener('DOMContentLoaded', () => {
-					myTimer = new fancytimer({ canvas: "myCanvas", seconds:60 });
-					// myTimer = new fancytimer({ canvas: "myCanvas", seconds:5, onElapsed:function(){ console.log("Elapsed"); }, loop:true, style: {color:"#7295ED", 'font-style': "Open Sans, Arial"} });
-					// myTimer = new fancytimer({ canvas: "myCanvas", endTime:new Date(new Date().getTime()+5000), onElapsed:function(){ console.log("Elapsed"); }, style: {color:"#7295ED", 'font-style': "Open Sans, Arial"} });
-					// myTimer = new fancytimer({ canvas: "myCanvas", seconds:5, startTime:new Date(new Date().getTime()+5000), onElapsed:function(){ console.log("Elapsed"); }, style: {color:"#7295ED", 'font-style': "Open Sans, Arial"} });
+					myTimer = new fancytimer({ canvas: "myCanvas", seconds:60, style: { color:"#7295ED", 'font': "Open Sans, Arial" } });
+					// myTimer = new fancytimer({ canvas: "myCanvas", seconds:5, onElapsed:function(){ console.log("Elapsed"); }, loop:true, style: {color:"#7295ED", 'font': "Open Sans, Arial"} });
+					// myTimer = new fancytimer({ canvas: "myCanvas", endTime:new Date(new Date().getTime()+5000), onElapsed:function(){ console.log("Elapsed"); }, style: {color:"#7295ED", 'font': "Open Sans, Arial"} });
+					// myTimer = new fancytimer({ canvas: "myCanvas", seconds:5, startTime:new Date(new Date().getTime()+5000), onElapsed:function(){ console.log("Elapsed"); }, style: {color:"#7295ED", 'font': "Open Sans, Arial"} });
 					myTimer.start();
 
-					// var myTimer = new fancytimer({ canvas: "myCanvas", formatter:function(obj){ var i = new Date().getHours(); return { text:i, percentDone:(24-i)/24 } }, hours:10, minutes:1, seconds:12, loop:true, style: {color:"#18314F", 'font-style': "Open Sans"} }).start();
-					// var myTimerB = new fancytimer({ canvas: "myCanvasB", formatter:function(obj){ var i = ("0"+new Date().getMinutes()).slice(-2); return { text:i, percentDone:(60-i)/60 } }, hours:10, minutes:1, seconds:12, loop:true, style: {color:"#384E77", 'font-style': "Open Sans"} }).start();
-					// var myTimerC = new fancytimer({ canvas: "myCanvasC", formatter:function(obj){ var i = ("0"+new Date().getSeconds()).slice(-2); return { text:i, percentDone:(60-i)/60 } }, hours:10, minutes:1, seconds:12, loop:true, style: {color:"#8BBEB2", 'font-style': "Open Sans"} }).start();
+					// var myTimer = new fancytimer({ canvas: "myCanvas", formatter:function(obj){ var i = new Date().getHours(); return { text:i, percentDone:(24-i)/24 } }, hours:10, minutes:1, seconds:12, loop:true, style: {color:"#18314F", 'font': "Open Sans"} }).start();
+					// var myTimerB = new fancytimer({ canvas: "myCanvasB", formatter:function(obj){ var i = ("0"+new Date().getMinutes()).slice(-2); return { text:i, percentDone:(60-i)/60 } }, hours:10, minutes:1, seconds:12, loop:true, style: {color:"#384E77", 'font': "Open Sans"} }).start();
+					// var myTimerC = new fancytimer({ canvas: "myCanvasC", formatter:function(obj){ var i = ("0"+new Date().getSeconds()).slice(-2); return { text:i, percentDone:(60-i)/60 } }, hours:10, minutes:1, seconds:12, loop:true, style: {color:"#8BBEB2", 'font': "Open Sans"} }).start();
 				});
 			</script>
 
