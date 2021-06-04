@@ -19,12 +19,12 @@ module.exports = function(grunt) {
         cssmin: {
             target: {
               files: {
-                'dist/fancyTimer.min.css': ['src/fancyTimer.css']
+                // 'dist/fancyTimer.min.css': ['src/fancyTimer.css']
               }
             }
           }
     });
-    grunt.loadNpmTasks('grunt-contrib-uglify-es');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.registerTask('default', ['uglify','cssmin']);
 };
