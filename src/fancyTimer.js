@@ -3,6 +3,7 @@ var fancytimer = function(options) {
 	var mergeDeep=function r(...e){const c=r=>r&&"object"==typeof r;return e.reduce((e,t)=>(Object.keys(t).forEach(a=>{const o=e[a],n=t[a];Array.isArray(o)&&Array.isArray(n)?e[a]=o.concat(...n):c(o)&&c(n)?e[a]=r(o,n):e[a]=n}),e),{})};
 	var settings = mergeDeep({
 		hours:0, minutes: 0, seconds: 0,
+		showGrains: true,
 		loop: false,
 		style:{
 			'color': "rgba(0,0,0,0.5)",
@@ -10,7 +11,7 @@ var fancytimer = function(options) {
 			'line-width': 8
 		},
 		formatter:function(timer){
-			return { text: formatTime(Math.ceil(timer.remainingms / 1000)), percentDone: timer.remainingms / (settings.seconds * 1000) }
+			return { text: formatTime(Math.ceil(timer.remainingms / 1000)), percentDone: timer.remainingms / (timer.endTime.getTime()-timer.startTime.getTime()) }
 		},
 		onElapsed: function(){},
 		onPause: function(){},
@@ -24,6 +25,26 @@ var fancytimer = function(options) {
 	// Private functions
 	var stopTimer = function() {
 		window.clearInterval(thisTimer.timer);
+	};
+	var reset = function() {
+		if(!settings.loop)
+			stopTimer();
+		thisTimer.paused = false;
+		thisTimer.started = false;
+		thisTimer.startTime = settings.startTime ?? new Date();
+		thisTimer.endTime = settings.endTime ?? null;
+		if(thisTimer.endTime && settings.seconds)
+			thisTimer.startTime = new Date(thisTimer.endTime.getTime()-settings.seconds*1000);
+		if(thisTimer.endTime && !settings.seconds)
+			thisTimer.startTime = new Date();
+		thisTimer.endTime = thisTimer.endTime ?? (settings.seconds)?new Date(thisTimer.startTime.getTime()+settings.seconds*1000) : new Date();
+		if(settings.loop){
+			thisTimer.startTime = new Date();
+			thisTimer.endTime = new Date(thisTimer.startTime.getTime() + settings.seconds*1000);
+			thisTimer.started = true;
+		}
+		thisTimer.elapsedms = 0;
+		thisTimer.remainingms = (settings.seconds) ? settings.seconds * 1000 : thisTimer.endTime.getTime() - thisTimer.startTime.getTime();
 	};
 	var formatTime = function(seconds) {
 		seconds = Math.round(seconds);
@@ -56,15 +77,18 @@ var fancytimer = function(options) {
 			thisTimer.elapsedms = new Date().getTime() - thisTimer.startTime.getTime();
 			thisTimer.remainingms = thisTimer.endTime.getTime() - new Date().getTime(); //   settings.seconds * 1000 - thisTimer.elapsedms;
 		}
-		
 		if (thisTimer.remainingms <= 0) {
-			stopTimer();
-			thisTimer.elapsedms = settings.seconds * 1000;
-			thisTimer.remainingms = 0;
+			if(settings.loop){
+				reset();
+			} else {
+				stopTimer();
+				thisTimer.elapsedms = settings.seconds * 1000;
+				thisTimer.remainingms = 0;
+			}
 			settings.onElapsed.call(this, thisTimer);
 		}
 		var state = settings.formatter(thisTimer);
-		var percent = (typeof state === 'object' && 'percentDone' in state) ? state.percentDone : thisTimer.remainingms / (settings.seconds * 1000);
+		var percent = (typeof state === 'object' && 'percentDone' in state) ? state.percentDone : thisTimer.remainingms / (thisTimer.endTime.getTime()-thisTimer.startTime.getTime());
 		var timerText = (typeof state === 'object' && 'text' in state) ? state.text : state;
 
 		ctx.clearRect(0, 0, c.width, c.height);
@@ -81,13 +105,16 @@ var fancytimer = function(options) {
 		);
 		ctx.stroke();
 
-		circle(ctx, 250, (ctx.lineWidth/2), (ctx.lineWidth/2), settings.style.color);
-		var p = displace(c.width/2, c.height/2, 360*percent, (Math.min(c.width, c.height)/2)-(ctx.lineWidth/2));
+		var p = displace(c.width/2, c.height/2, 0, (Math.min(c.width, c.height)/2)-(ctx.lineWidth/2));
+		circle(ctx, p.x, p.y, (ctx.lineWidth/2), settings.style.color);
+		p = displace(c.width/2, c.height/2, 360*percent, (Math.min(c.width, c.height)/2)-(ctx.lineWidth/2));
 		circle(ctx, p.x, p.y, (ctx.lineWidth/2), settings.style.color);
 
-		for(var iperc=1; iperc>percent; iperc-=0.02){
-			var p = displace(c.width/2, c.height/2, 360*iperc, (Math.min(c.width, c.height)/2)-(ctx.lineWidth/2));
-			circle(ctx, p.x, p.y, (ctx.lineWidth/4), settings.style.color);
+		if(settings.showGrains){
+			for(var iperc=1; iperc>percent; iperc-= 1/(300/settings.style['line-width'])   ){
+				var p = displace(c.width/2, c.height/2, 360*iperc, (Math.min(c.width, c.height)/2)-(ctx.lineWidth/2));
+				circle(ctx, p.x, p.y, (ctx.lineWidth/4), settings.style.color);
+			}
 		}
 		
 		var textScale = (1/((""+timerText).length/6))*0.4; textScale=Math.min(textScale,1);
@@ -104,15 +131,17 @@ var fancytimer = function(options) {
 	var ctx = c.getContext("2d");
 	// Public functions
 	this.start = function() {
-		thisTimer.reset();
+		reset();
+		thisTimer.startTime = settings.startTime ?? new Date();
+		if(settings.seconds)
+			thisTimer.endTime = new Date(thisTimer.startTime.getTime() + settings.seconds*1000);
 		// if(thisTimer.started) return;
 		thisTimer.started = true;
-		thisTimer.startTime = thisTimer.startTime ?? new Date();
-		thisTimer.endTime = new Date(thisTimer.startTime.getTime() + settings.seconds*1000);
 		thisTimer.timer = window.setInterval(function() {
 			updateTimer();
 		}, 100);
 		settings.onStart.call(this, thisTimer);
+		return thisTimer;
 	};
 	this.pause = function(){
 		if(!thisTimer.started || thisTimer.paused)
@@ -120,6 +149,7 @@ var fancytimer = function(options) {
 		pauseTime = new Date();
 		thisTimer.paused = true;
 		settings.onPause.call(this, thisTimer);
+		return thisTimer;
 	};
 	this.resume = function(){
 		if(!thisTimer.started || !thisTimer.paused)
@@ -128,26 +158,21 @@ var fancytimer = function(options) {
 		thisTimer.endTime = new Date(thisTimer.endTime.getTime()+ms);
 		thisTimer.paused = false;
 		settings.onResume.call(this, thisTimer);
+		return thisTimer;
 	};
 	this.stop = function(){
-		thisTimer.reset();
+		settings.loop = false;
+		reset();
 		updateTimer();
 		settings.onStop.call(this, thisTimer);
+		return thisTimer;
 	}
 	this.reset = function(){
-		stopTimer();
-		thisTimer.paused = false;
-		thisTimer.started = false;
-		thisTimer.startTime = settings.startTime ?? null;
-		thisTimer.endTime = settings.endTime ?? null;
-		if(thisTimer.endTime && settings.seconds)
-		thisTimer.startTime = new Date(thisTimer.endTime.getTime()-settings.seconds*1000);
-		thisTimer.elapsedms = 0;
-		thisTimer.remainingms = settings.seconds * 1000;
+		reset();
 		settings.onReset.call(this, thisTimer);
+		return thisTimer;
 	}
-	this.reset();
-
+	reset();
 	updateTimer();
 	return thisTimer;
 };
