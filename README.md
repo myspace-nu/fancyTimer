@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.com/myspace-nu/fancyTimer.svg?branch=main)](https://travis-ci.com/myspace-nu/fancyTimer)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/myspace-nu/fancyTimer/blob/master/LICENSE)
+[![Code size](https://img.shields.io/github/languages/code-size/myspace-nu/fancyTimer)](https://github.com/myspace-nu/fancyTimer)
+[![Issues](https://img.shields.io/github/issues-raw/myspace-nu/fancyTimer)](https://github.com/myspace-nu/fancyTimer/issues)
 
 ## Live demo
 
